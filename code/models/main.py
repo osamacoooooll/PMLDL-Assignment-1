@@ -13,12 +13,12 @@ from collections import Counter
 from sklearn.preprocessing import StandardScaler
 import joblib  # To save and load the model
 
-current_path = os.getcwd()
-data_dir = os.path.join(current_path, 'dataset')
+current_path = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.abspath(os.path.join(current_path, '..', '..'))
+data_dir = os.path.join(base_dir, 'data', 'raw')
 
 # Load the dataset with the full path
-# df = pd.read_csv(os.path.join(data_dir, 'diabetes.csv'))
-df = pd.read_csv('diabetes.csv')
+df = pd.read_csv(os.path.join(data_dir, 'diabetes.csv'))
 
 x = df.iloc[:, :-1]
 y = df.iloc[:, -1]
