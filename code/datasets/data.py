@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from imblearn.over_sampling import RandomOverSampler
 import joblib
 
 # Load data
@@ -23,7 +24,11 @@ y = df.iloc[:, -1]
 scaler = StandardScaler()
 x_scaled = scaler.fit_transform(x)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+# Resample the data to handle imbalance
+r = RandomOverSampler()
+x_data, y_data = r.fit_resample(x, y)
+
+x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=42)
 
 pd.DataFrame(x_train).to_csv(os.path.join(processed_dir, 'x_train.csv'), index=False)
 pd.DataFrame(x_test).to_csv(os.path.join(processed_dir, 'x_test.csv'), index=False)
