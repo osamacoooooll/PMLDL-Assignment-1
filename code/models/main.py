@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_val_predict
 from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score
 from collections import Counter
 from sklearn.preprocessing import StandardScaler
 import joblib  # To save and load the model
@@ -29,15 +29,10 @@ d = scaler.fit_transform(x)
 
 # Resample the data to handle imbalance
 r = RandomOverSampler()
-x_data, y_data = r.fit_resample(x, y)
+x_data, y_data = r.fit_resample(d, y)
 
 # Split the data
-x_train, x_test, y_train, y_test = train_test_split(d, y, test_size=0.2, random_state=23)
-
-# Initialize KFold cross-validation
-kf = KFold(n_splits=5)
-l1 = LogisticRegression()
-kf.get_n_splits(x)
+x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=23)
 
 # Train RandomForestClassifier
 f1 = RandomForestClassifier()
@@ -47,6 +42,12 @@ f1.fit(x_train, y_train)
 f1_pred = f1.predict(x_test)
 f1_score = accuracy_score(y_test, f1_pred) * 100
 print("Accuracy:", f1_score)
+
+# Calculate precision and recall
+precision = precision_score(y_test, f1_pred)
+recall = recall_score(y_test, f1_pred)
+print("Precision:", precision)
+print("Recall:", recall)
 
 # Create the relative path to save the model
 model_dir = os.path.join(current_path, 'code', 'models')  # Create the path to 'code/models'
