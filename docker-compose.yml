@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     build:
@@ -5,6 +7,10 @@ services:
       dockerfile: deployment/api/Dockerfile
     ports:
       - "8001:8001"
+    volumes:
+      - ./code/models:/app/models  # Ensure models are accessible
+    environment:
+      - BACKEND_URL=http://backend:8001
 
   frontend:
     build:
@@ -14,3 +20,24 @@ services:
       - "8000:8000"
     environment:
       - BACKEND_URL=http://backend:8001
+
+  airflow:
+    image: apache/airflow:2.3.4
+    restart: always
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=sqlite:////usr/local/airflow/airflow.db
+      - AIRFLOW__WEBSERVER__WORKERS=4
+    volumes:
+      - ./services/airflow/dags:/usr/local/airflow/dags
+      - ./services/airflow/logs:/usr/local/airflow/logs
+      - ./services/airflow/plugins:/usr/local/airflow/plugins
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+      - frontend
+
+networks:
+  default:
+    driver: bridge
